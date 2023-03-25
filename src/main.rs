@@ -1,12 +1,17 @@
-use std::env;
 use std::fs;
 use regex::Regex;
+use clap::Parser;
+
+#[derive(Parser)]
+struct Cli{
+    path: std::path::PathBuf
+}
+
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let note_dir_name = &args[1];
+    let args = Cli::parse();
 
-    let dir_entries = fs::read_dir(note_dir_name).unwrap();
+    let dir_entries = fs::read_dir(&args.path).unwrap();
     
     let mut dir_entries_sorted = dir_entries
         .map(|entry| entry.unwrap())
