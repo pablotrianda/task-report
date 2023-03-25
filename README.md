@@ -1,23 +1,20 @@
 # Task Report
 
-Script hacer un reporte de las tareas realizadas en el día.
+Script to print a daily work report, using daily work notes.
 
 ## Datasource
-Cada día registro en notas el ticket que estoy trabajando y el ticket anterior para informar en la daily del equipo.
-Por el momento la nota es creada a mano diariamente.
-La estructura de la nota es:
+Every day I log in notes the ticket I'm working on and the previous ticket to report on the team's daily.
+At the moment, the note is created manually on a daily basis.
+The structure of the note is:
 ```
 Daily:
 	* MBM-1234 Tarea de ayer [x]
 Today:
 	* MBM-1235 Nueva tarea []
 ```
-El nombre del archivo contiene la fecha:
 `20230323_notes.md`
 
 ## Report structure
-Formato: impreso en pantalla por ahora
-El reporte esperado tiene que ser así:
 ```
 23/03/23
 	- MBM-1010
