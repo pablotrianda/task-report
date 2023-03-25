@@ -20,6 +20,15 @@ fn main() {
 
 }
 
+// Read the file with the given name.
+// only read the part what begins with "Today" tag.
+// The file struct is:
+//  ```
+//  Daily:
+//      * Item to chat in the daily meeting
+//  Today:
+//      * Item was I currently work
+//  ````
 fn read_a_file(note_file_name: &str){
     let content = fs::read_to_string(note_file_name)
         .expect("Error to read the file");
@@ -49,6 +58,7 @@ fn print_title(note_file_name: &str){
 }
 
 // Print the task number, this number correspond to Jira tikect
+// All tickets begin with the following code: MBM-1234
 fn print_tasks(tasks: Vec<&str>){
     let re = Regex::new(r"MBM-\d{4}").unwrap();
 
