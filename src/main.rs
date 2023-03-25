@@ -1,6 +1,7 @@
 use std::fs;
 use regex::Regex;
 use clap::Parser;
+use colored::*;
 
 #[derive(Parser)]
 struct Cli{
@@ -59,7 +60,9 @@ fn print_title(note_file_name: &str){
     let month = &full_date[4..6];
     let day = &full_date[6..8];
 
-    println!("{}-{}-{}", day, month, year);
+    let show_date = day.to_owned()+"-"+month +"-"+year;
+
+    println!("{}:", show_date.bold().cyan());
 }
 
 // Print the task number, this number correspond to Jira tikect
