@@ -25,7 +25,7 @@ jobs:
       with:
         body_path: ".github/RELEASE-TEMPLATE.md"
         draft: true
-        files: brancher
+        files: target/debug/task-report
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
