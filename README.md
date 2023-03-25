@@ -2,6 +2,11 @@
 
 Script to print a daily work report, using daily work notes.
 
+## Usage
+```bash
+task-report data/tasks_202303/
+```
+
 ## Datasource
 Every day I log in notes the ticket I'm working on and the previous ticket to report on the team's daily.
 At the moment, the note is created manually on a daily basis.
