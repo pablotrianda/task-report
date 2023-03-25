@@ -19,5 +19,5 @@ Today:
 ```
 `20230323_notes.md`
 
-## Report structure
+## Report:
 ![image](https://user-images.githubusercontent.com/6902179/227689217-e2eee2a4-f90b-4910-bbb6-9cebb0b6061e.png)
