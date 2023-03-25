@@ -13,9 +13,9 @@ At the moment, the note is created manually on a daily basis.
 The structure of the note is:
 ```
 Daily:
-	* MBM-1234 Tarea de ayer [x]
+	* MBM-1234 Yesterday task [x]
 Today:
-	* MBM-1235 Nueva tarea []
+	* MBM-1235 today task []
 ```
 `20230323_notes.md`
 
