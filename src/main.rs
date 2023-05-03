@@ -69,11 +69,16 @@ fn print_title(note_file_name: &str){
 // All tickets begin with the following code: MBM-1234
 fn print_tasks(tasks: Vec<&str>){
     let re = Regex::new(r"MBM-\d{4}").unwrap();
+    let mut ticket_numbers = Vec::new();
 
+    // Get only the codes tickets
     for t in &tasks {
         if re.is_match(t){
             let ticket_number = re.captures(t).unwrap();
-            println!("\t{:?}",ticket_number.get(0).map_or("", |m| m.as_str()));
+            ticket_numbers.push(ticket_number.get(0).map_or("", |m| m.as_str()));
         }
     }
+
+    let restult = ticket_numbers.join(", ");
+    println!("{}",restult);
 }
