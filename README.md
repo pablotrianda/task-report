@@ -19,16 +19,5 @@ Today:
 ```
 `20230323_notes.md`
 
-## Report structure
-```
-23/03/23
-	- MBM-1010
-	- MBM-1111
-	- MBM-1123
-24/03/23
-	- MBM-8989
-	- MBM-2222
-27/03/23
-	- MBM-2222
-	- MBM-1111
-```
+## Report:
+![image](https://user-images.githubusercontent.com/6902179/227689217-e2eee2a4-f90b-4910-bbb6-9cebb0b6061e.png)
