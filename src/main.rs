@@ -5,24 +5,41 @@ use colored::*;
 
 #[derive(Parser)]
 struct Cli{
-    path: std::path::PathBuf
+    path: std::path::PathBuf,
+
+    #[arg(short, long, default_value_t = false)]
+    json_print: bool
 }
 
 
 fn main() {
     let args = Cli::parse();
 
+    // Parameters
     let dir_entries = fs::read_dir(&args.path).unwrap();
-    
+    let json_print = &args.json_print;
+
+    // Get all files from directory
     let mut dir_entries_sorted = dir_entries
         .map(|entry| entry.unwrap())
         .collect::<Vec<_>>();
         
     dir_entries_sorted.sort_by_key(|entry| entry.path());
-    
+
+    let last_file: &str = &dir_entries_sorted.last().expect("El vector dir_entries_sorted está vacío.").path().display().to_string();
+
+
+    if *json_print { println!("{}","{") }
     for entry in dir_entries_sorted {
-        read_a_file(&entry.path().display().to_string());
+        let file_name = &entry.path().display().to_string();
+        read_a_file(file_name, *json_print);
+        if last_file == file_name  {
+            println!("{}", r"");
+        } else {
+            println!("{}", r",");
+        }
     }
+    if *json_print { println!("{}","}") }
 
 }
 
@@ -35,7 +52,7 @@ fn main() {
 //  Today:
 //      * Item was I currently work
 //  ````
-fn read_a_file(note_file_name: &str){
+fn read_a_file(note_file_name: &str, json_print: bool){
     let content = fs::read_to_string(note_file_name)
         .expect("Error to read the file");
 
@@ -43,8 +60,8 @@ fn read_a_file(note_file_name: &str){
 
     let today: Vec<&str>= v.last().unwrap().split('*').collect();
 
-    print_title(note_file_name);
-    print_tasks(today)
+    print_title(note_file_name, json_print);
+    print_tasks(today, json_print);
 }
 
 // Print the title, in this case is the file date
@@ -52,7 +69,7 @@ fn read_a_file(note_file_name: &str){
 //          dd-mm-yyyy
 // And the file names have the following format:
 //          yyyymmdd_notes.md
-fn print_title(note_file_name: &str){
+fn print_title(note_file_name: &str, json_print: bool){
     let re = Regex::new(r"\d{8}").unwrap();
     let title = re.captures(note_file_name).unwrap();
     let full_date = title.get(0).map_or("", |m| m.as_str());
@@ -62,12 +79,16 @@ fn print_title(note_file_name: &str){
 
     let show_date = day.to_owned()+"-"+month +"-"+year;
 
-    println!("{}:", show_date.bold().cyan());
+    if json_print {
+        print!("{}",format!("\"{}\":", &show_date));
+    }else{
+        println!("{}:", show_date.bold().cyan());
+    }
 }
 
 // Print the task number, this number correspond to Jira tikect
 // All tickets begin with the following code: MBM-1234
-fn print_tasks(tasks: Vec<&str>){
+fn print_tasks(tasks: Vec<&str>, json_print: bool){
     let re = Regex::new(r"MBM-\d{4}").unwrap();
     let mut ticket_numbers = Vec::new();
 
@@ -79,6 +100,11 @@ fn print_tasks(tasks: Vec<&str>){
         }
     }
 
-    let restult = ticket_numbers.join(", ");
-    println!("{}",restult);
+    if json_print {
+        let quoted_ticket_numbers: Vec<String> = ticket_numbers.iter().map(|&s| format!("\"{}\"", s)).collect();
+        print!("[{}]",quoted_ticket_numbers.join(","));
+    }else{
+        let result = ticket_numbers.join(", ");
+        print!("{}",result);
+    }
 }
