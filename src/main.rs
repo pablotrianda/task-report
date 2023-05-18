@@ -29,7 +29,7 @@ fn main() {
     let last_file: &str = &dir_entries_sorted.last().expect("El vector dir_entries_sorted está vacío.").path().display().to_string();
 
 
-    if *json_print { println!("{}","{") }
+    if *json_print { println!("{}","[") }
     for entry in dir_entries_sorted {
         let file_name = &entry.path().display().to_string();
         read_a_file(file_name, *json_print);
@@ -39,7 +39,7 @@ fn main() {
             println!("{}", r",");
         }
     }
-    if *json_print { println!("{}","}") }
+    if *json_print { println!("{}","]") }
 
 }
 
@@ -60,8 +60,10 @@ fn read_a_file(note_file_name: &str, json_print: bool){
 
     let today: Vec<&str>= v.last().unwrap().split('*').collect();
 
+    if json_print { print!("{}","{") }
     print_title(note_file_name, json_print);
     print_tasks(today, json_print);
+    if json_print { print!("{}","}") }
 }
 
 // Print the title, in this case is the file date
@@ -80,7 +82,7 @@ fn print_title(note_file_name: &str, json_print: bool){
     let show_date = day.to_owned()+"-"+month +"-"+year;
 
     if json_print {
-        print!("{}",format!("\"{}\":", &show_date));
+        print!("{}",format!("\"date\":\"{}\",", &show_date));
     }else{
         println!("{}:", show_date.bold().cyan());
     }
@@ -102,7 +104,7 @@ fn print_tasks(tasks: Vec<&str>, json_print: bool){
 
     if json_print {
         let quoted_ticket_numbers: Vec<String> = ticket_numbers.iter().map(|&s| format!("\"{}\"", s)).collect();
-        print!("[{}]",quoted_ticket_numbers.join(","));
+        print!("\"tasks\":[{}]",quoted_ticket_numbers.join(","));
     }else{
         let result = ticket_numbers.join(", ");
         print!("{}",result);
