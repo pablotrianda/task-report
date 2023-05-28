@@ -11,6 +11,11 @@ struct Cli{
     json_print: bool
 }
 
+struct TicketData {
+    title: String,
+    tickets: Vec<String>,
+}
+
 
 fn main() {
     let args = Cli::parse();
@@ -21,25 +26,21 @@ fn main() {
 
     // Get all files from directory
     let mut dir_entries_sorted = dir_entries
-        .map(|entry| entry.unwrap())
+        .map(|entry| entry.unwrap().path().display().to_string())
         .collect::<Vec<_>>();
-        
-    dir_entries_sorted.sort_by_key(|entry| entry.path());
+    dir_entries_sorted.sort();
 
-    let last_file: &str = &dir_entries_sorted.last().expect("El vector dir_entries_sorted está vacío.").path().display().to_string();
+    let mut tickets: Vec<TicketData> = Vec::new();
 
-
-    if *json_print { println!("{}","[") }
     for entry in dir_entries_sorted {
-        let file_name = &entry.path().display().to_string();
-        read_a_file(file_name, *json_print);
-        if last_file == file_name  {
-            println!("{}", r"");
-        } else {
-            println!("{}", r",");
-        }
+        tickets.push(read_a_file(&entry));
     }
-    if *json_print { println!("{}","]") }
+
+    if *json_print {
+        print_json(tickets);
+    }else{
+        print_data(tickets);
+    }
 
 }
 
@@ -52,18 +53,24 @@ fn main() {
 //  Today:
 //      * Item was I currently work
 //  ````
-fn read_a_file(note_file_name: &str, json_print: bool){
+//  Return the title and tick by each day
+fn read_a_file(note_file_name: &String) -> TicketData{
     let content = fs::read_to_string(note_file_name)
         .expect("Error to read the file");
 
     let v: Vec<&str> = content.split("Today:").collect();
 
-    let today: Vec<&str>= v.last().unwrap().split('*').collect();
+    let today_tasks: Vec<&str>= v.clone().last().unwrap().split('*').collect();
 
-    if json_print { print!("{}","{") }
-    print_title(note_file_name, json_print);
-    print_tasks(today, json_print);
-    if json_print { print!("{}","}") }
+    // Get data from file
+    let title: String = print_title(note_file_name);
+    let ticket_numbers: Vec<String> = print_tasks(today_tasks);
+
+    TicketData{
+        title,
+        tickets: ticket_numbers
+    }
+
 }
 
 // Print the title, in this case is the file date
@@ -71,7 +78,7 @@ fn read_a_file(note_file_name: &str, json_print: bool){
 //          dd-mm-yyyy
 // And the file names have the following format:
 //          yyyymmdd_notes.md
-fn print_title(note_file_name: &str, json_print: bool){
+fn print_title(note_file_name: &str) -> String{
     let re = Regex::new(r"\d{8}").unwrap();
     let title = re.captures(note_file_name).unwrap();
     let full_date = title.get(0).map_or("", |m| m.as_str());
@@ -81,16 +88,12 @@ fn print_title(note_file_name: &str, json_print: bool){
 
     let show_date = day.to_owned()+"-"+month +"-"+year;
 
-    if json_print {
-        print!("{}",format!("\"date\":\"{}\",", &show_date));
-    }else{
-        println!("{}:", show_date.bold().cyan());
-    }
+    show_date
 }
 
 // Print the task number, this number correspond to Jira tikect
 // All tickets begin with the following code: MBM-1234
-fn print_tasks(tasks: Vec<&str>, json_print: bool){
+fn print_tasks(tasks: Vec<&str>) -> Vec<String>{
     let re = Regex::new(r"MBM-\d{4}").unwrap();
     let mut ticket_numbers = Vec::new();
 
@@ -98,15 +101,41 @@ fn print_tasks(tasks: Vec<&str>, json_print: bool){
     for t in &tasks {
         if re.is_match(t){
             let ticket_number = re.captures(t).unwrap();
-            ticket_numbers.push(ticket_number.get(0).map_or("", |m| m.as_str()));
+            ticket_numbers.push(String::from(ticket_number.get(0).map_or("", |m| m.as_str())));
         }
     }
 
-    if json_print {
-        let quoted_ticket_numbers: Vec<String> = ticket_numbers.iter().map(|&s| format!("\"{}\"", s)).collect();
-        print!("\"tasks\":[{}]",quoted_ticket_numbers.join(","));
-    }else{
-        let result = ticket_numbers.join(", ");
-        print!("{}",result);
+    return ticket_numbers.clone()
+}
+
+fn print_data(tasks: Vec<TicketData>){
+    for day in tasks {
+        print!("{}:", day.title.bold().cyan());
+        print!("{} \n",day.tickets.join(", "));
     }
 }
+
+fn print_json(tasks: Vec<TicketData>){
+    println!("{}","["); 
+    let last_element = String::from(&tasks.last().unwrap().title);
+    for day in tasks {
+        // Element
+        print!("{}","{");
+        // Date
+        print!("{}",format!("\"date\":\"{}\",", day.title));
+        // Ticket numbers
+        let quoted_ticket_numbers: Vec<String> = day.tickets.iter().map(|s| format!("\"{}\"", s)).collect();
+        print!("\"tasks\":[{}]",quoted_ticket_numbers.join(","));
+        // End element
+        // Check if is the last element to avaoid trailing comma
+        if last_element == day.title {
+            print!("{}","}");
+        }else{
+            print!("{},","}");
+        }
+    }
+    println!("{}","]"); 
+
+}
+
+
