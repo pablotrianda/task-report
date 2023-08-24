@@ -90,7 +90,7 @@ fn print_title(note_file_name: &str) -> String {
 // Print the task number, this number correspond to Jira tikect
 // All tickets begin with the following code: XXXX-1234
 fn print_tasks(tasks: Vec<&str>) -> Vec<String> {
-    let re = Regex::new(r"([A-Z]+)-\d{4}").unwrap();
+    let re = Regex::new(r"([A-Z]+)-\d+").unwrap();
     let mut ticket_numbers = Vec::new();
 
     // Get only the codes tickets
